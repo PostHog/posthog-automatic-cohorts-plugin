@@ -1,0 +1,45 @@
+{
+    "name": "Session Tracker",
+    "url": "https://github.com/PostHog/session-tracker-plugin",
+    "description": "Advanced session tracking for PostHog.",
+    "main": "index.ts",
+    "config": [
+        {
+            "key": "propertiesToTrack",
+            "hint": "**Format:**`propertyA,propertyB` **Spaces are not allowed**",
+            "name": "List of properties for which to create a new cohort per value",
+            "type": "string",
+            "order": 1,
+            "default": "",
+            "required": true
+        },
+        {
+            "key": "posthogHost",
+            "hint": "Optional - defaults to https://app.posthog.com",
+            "name": "URL of your PostHog instance",
+            "type": "string",
+            "default": "https://app.posthog.com",
+            "required": false
+        },
+        {
+            "key": "posthogApiKey",
+            "hint": "Your Personal API Key is not the same as the Project API key",
+            "name": "PostHog API Key",
+            "type": "string",
+            "default": "",
+            "required": true,
+            "secret": true
+        },
+        {
+          "key": "namingConvention",
+          "hint": "Include `<property_name> and <property_value> in your input. Default: `Users with <property_name>=<property_value>``",
+          "name": "Cohort naming convention",
+          "type": "string",
+          "default": "Users with <property_name>=<property_value>",
+          "required": true,
+          "secret": true
+        }
+    ]
+}
+
+
