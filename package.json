@@ -1,7 +1,7 @@
 {
-    "name": "session-tracker",
+    "name": "posthog-automatic-cohorts-plugin",
     "version": "0.0.1",
-    "description": "Advanced session tracking for PostHog.",
+    "description": "Automatic cohort creation based on user properties.",
     "main": "index.ts",
     "scripts": {
         "test": "jest"

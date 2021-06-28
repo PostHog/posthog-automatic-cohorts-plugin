@@ -1,7 +1,7 @@
 {
-    "name": "Session Tracker",
-    "url": "https://github.com/PostHog/session-tracker-plugin",
-    "description": "Advanced session tracking for PostHog.",
+    "name": "Automatic Cohort Creator",
+    "url": "https://github.com/PostHog/posthog-automatic-cohorts-plugin",
+    "description": "Automatic cohort creation based on user properties.",
     "main": "index.ts",
     "config": [
         {

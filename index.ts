@@ -33,7 +33,7 @@ interface CreateCohortFromPropertyPayload extends CohortJobPayload {
 }
 
 export const jobs: AutomaticCohortsPlugin['jobs'] = {
-    retryCreateCohortFromProperty: async (payload: CohortJobPayload, meta: AutomaticCohortsMeta) => {
+    createCohortFromProperty: async (payload: CohortJobPayload, meta: AutomaticCohortsMeta) => {
         await createCohortFromProperty({ ...payload, meta })
     },
 }
@@ -55,33 +55,26 @@ export const setupPlugin: AutomaticCohortsPlugin['setupPlugin'] = ({ config, glo
     global.propertiesToTrack = new Set(config.propertiesToTrack.split(','))
 }
 export const onEvent: AutomaticCohortsPlugin['onEvent'] = async (event: PluginEvent, meta) => {
-    if (!event.properties) {
+    if (!event.properties && !event.$set && !event.$set_once) {
+        return
+    }
+    const { global, jobs } = meta
+
+    const props = Object.entries({
+        ...(event.properties!['$set'] || {}),
+        ...(event.properties!['$set_once'] || {}),
+        ...(event.$set_once || {}),
+        ...(event.$set || {}),
+    })
+    const usefulProperties = props.filter(([key, _]) => global.propertiesToTrack.has(key))
+
+    if (!usefulProperties.length) {
         return
     }
 
-    const buffer = createBuffer({
-        onFlush: async () => {
-            const { global } = meta
-            const props = Object.entries({
-                ...(event.properties!['$set'] || {}),
-                ...(event.properties!['$set_once'] || {}),
-            })
-            const usefulProperties = props.filter(([key, _]) => global.propertiesToTrack.has(key))
-    
-            if (!usefulProperties.length) {
-                return
-            }
-    
-            const [property, value] = usefulProperties[0]
-            await createCohortFromProperty({ property, value, meta, retriesPerformedSoFar: 0 })
-        },
-        timeoutSeconds: 0,
-        limit: 0
-    })
+    const [property, value] = usefulProperties[0]
 
-    buffer.add(null, 1)
-
-
+    await jobs.createCohortFromProperty({ property, value, retriesPerformedSoFar: 0 }).runNow()
 }
 
 const createCohortFromProperty = async ({
@@ -105,9 +98,9 @@ const createCohortFromProperty = async ({
     const response = await nodeFetch(`${global.posthogHost}/api/cohort`, {
         ...global.posthogOptions,
         body: JSON.stringify(requestData),
+        method: 'POST'
     })
 
-    console.log(response)
 
     if (response.status.toString().startsWith('5')) {
         const nextRetryMs = 2 ** retriesPerformedSoFar * 3000
@@ -118,7 +111,6 @@ const createCohortFromProperty = async ({
     }
 
     if (response.ok) {
-        console.log('Successfully created new cohort')
         await storage.set(`${property}_${value}`, true)
         return
     }
