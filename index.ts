@@ -39,8 +39,8 @@ export const jobs: AutomaticCohortsPlugin['jobs'] = {
 }
 
 export const setupPlugin: AutomaticCohortsPlugin['setupPlugin'] = ({ config, global }) => {
-    if (!config.namingConvention.includes('<property_name>') || !config.namingConvention.includes('<property_value>')) {
-        throw new Error('Invalid naming convention! Make sure to include <property_name> and <property_value>.')
+    if (!config.namingConvention.includes('<property_value>')) {
+        throw new Error('Invalid naming convention! Make sure to include <property_value>.')
     }
 
     global.posthogHost = config.posthogHost.includes('http') ? config.posthogHost : 'https://' + config.posthogHost
