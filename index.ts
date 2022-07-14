@@ -32,6 +32,11 @@ interface CreateCohortFromPropertyPayload extends CohortJobPayload {
     meta: AutomaticCohortsMeta
 }
 
+export const jobs: AutomaticCohortsPlugin['jobs'] = {
+    createCohortFromProperty: async (payload: CohortJobPayload, meta: AutomaticCohortsMeta) => {
+        await createCohortFromProperty({ ...payload, meta })
+    },
+}
 
 export const setupPlugin: AutomaticCohortsPlugin['setupPlugin'] = ({ config, global }) => {
     if (!config.namingConvention.includes('<property_value>')) {
