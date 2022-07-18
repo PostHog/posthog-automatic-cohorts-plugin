@@ -32,13 +32,9 @@ interface CreateCohortFromPropertyPayload extends CohortJobPayload {
     meta: AutomaticCohortsMeta
 }
 
-export const jobs: AutomaticCohortsPlugin['jobs'] = {
-    createCohortFromProperty: async (payload: CohortJobPayload, meta: AutomaticCohortsMeta) => {
-        await createCohortFromProperty({ ...payload, meta })
-    },
-}
-
 export const setupPlugin: AutomaticCohortsPlugin['setupPlugin'] = ({ config, global }) => {
+    console.warn('⚠️ This plugin is deprecated! Please move to using group analytics instead. Read more: https://posthog.com/docs/user-guides/group-analytics')
+    
     if (!config.namingConvention.includes('<property_value>')) {
         throw new Error('Invalid naming convention! Make sure to include <property_value>.')
     }
@@ -58,7 +54,7 @@ export const onEvent: AutomaticCohortsPlugin['onEvent'] = async (event: PluginEv
     if (!event.properties && !event.$set && !event.$set_once) {
         return
     }
-    const { global, jobs } = meta
+    const { global } = meta
 
     const props = Object.entries({
         ...(event.properties!['$set'] || {}),
@@ -83,7 +79,7 @@ const createCohortFromProperty = async ({
     retriesPerformedSoFar,
     meta,
 }: CreateCohortFromPropertyPayload): Promise<void> => {
-    const { global, jobs, storage, config } = meta
+    const { global, storage, config } = meta
 
     const hasCohortBeenCreated = await storage.get(`${property}_${value}`, false)
     if (hasCohortBeenCreated) {
@@ -100,15 +96,6 @@ const createCohortFromProperty = async ({
         body: JSON.stringify(requestData),
         method: 'POST'
     })
-
-
-    if (response.status.toString().startsWith('5')) {
-        const nextRetryMs = 2 ** retriesPerformedSoFar * 3000
-        await jobs
-            .retryCreateCohortFromProperty({ property, value, retriesPerformedSoFar: retriesPerformedSoFar + 1 })
-            .runIn(nextRetryMs, 'milliseconds')
-        return
-    }
 
     if (response.ok) {
         await storage.set(`${property}_${value}`, true)
