@@ -70,7 +70,7 @@ export const onEvent: AutomaticCohortsPlugin['onEvent'] = async (event: PluginEv
 
     const [property, value] = usefulProperties[0]
     
-    await createCohortFromProperty({ property, value, retriesPerformedSoFar: 0 })
+    await createCohortFromProperty({ property, value, retriesPerformedSoFar: 0, meta })
 }
 
 const createCohortFromProperty = async ({
