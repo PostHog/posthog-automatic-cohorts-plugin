@@ -1,5 +1,4 @@
 import { PluginEvent, PluginMeta, Plugin } from '@posthog/plugin-scaffold'
-import { createBuffer } from '@posthog/plugin-contrib'
 import nodeFetch from 'node-fetch'
 
 interface PosthogOptions {
