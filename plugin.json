@@ -5,7 +5,7 @@
     "main": "index.ts",
     "config": [
         {
-            "markdown": "⚠️ This plugin is deprecated! Please move to using group analytics instead. [Read more](https://posthog.com/docs/user-guides/group-analytics)."
+            "markdown": "## ⚠️ This plugin is deprecated! Please move to using group analytics instead. [Read more](https://posthog.com/docs/user-guides/group-analytics)."
         },
         {
             "key": "propertiesToTrack",
